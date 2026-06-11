@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revolver Simulator — 100 Chambers</title>
+    <meta name="description" content="Interactive revolver simulation with multiple game modes, achievements, and dynamic danger theming.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="danger-low" id="appBody">
+    <div class="bg-particles" id="particles"></div>
+    <div class="vignette-overlay" id="vignetteOverlay"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header" id="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 40 40" fill="none">
+                        <circle cx="20" cy="20" r="18" stroke="url(#logoGrad)" stroke-width="2"/>
+                        <circle cx="20" cy="20" r="4" fill="url(#logoGrad)"/>
+                        <line x1="20" y1="2" x2="20" y2="10" stroke="url(#logoGrad)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="20" y1="30" x2="20" y2="38" stroke="url(#logoGrad)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="2" y1="20" x2="10" y2="20" stroke="url(#logoGrad)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="30" y1="20" x2="38" y2="20" stroke="url(#logoGrad)" stroke-width="1.5" stroke-linecap="round"/>
+                        <defs>
+                            <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#ff4444"/>
+                                <stop offset="100%" stop-color="#ff8844"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="logo-title">REVOLVER</h1>
+                    <p class="logo-subtitle" id="modeSubtitle">100-CHAMBER SIMULATION</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-stats" id="headerStats">
+                    <div class="stat-chip" id="chipChambers">
+                        <span class="stat-label">Chambers</span>
+                        <span class="stat-value" id="chipChambersVal">100</span>
+                    </div>
+                    <div class="stat-chip stat-chip--danger" id="chipLive">
+                        <span class="stat-label">Live</span>
+                        <span class="stat-value" id="chipLiveVal">1</span>
+                    </div>
+                </div>
+                <button class="btn-icon-only" id="btnAchievements" onclick="toggleAchievements()" title="Achievements">
+                    <span>🏆</span>
+                    <span class="badge-count" id="badgeCount">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Game Mode Selector -->
+        <nav class="mode-selector" id="modeSelector">
+            <button class="mode-tab active" data-mode="classic" onclick="switchMode('classic')">
+                <span class="mode-tab-icon">🎯</span>
+                <span class="mode-tab-label">Classic</span>
+            </button>
+            <button class="mode-tab" data-mode="escalation" onclick="switchMode('escalation')">
+                <span class="mode-tab-icon">🌀</span>
+                <span class="mode-tab-label">Escalation</span>
+            </button>
+            <button class="mode-tab" data-mode="countdown" onclick="switchMode('countdown')">
+                <span class="mode-tab-icon">⏱️</span>
+                <span class="mode-tab-label">Countdown</span>
+            </button>
+            <button class="mode-tab" data-mode="dealer" onclick="switchMode('dealer')">
+                <span class="mode-tab-icon">🎰</span>
+                <span class="mode-tab-label">Dealer's Choice</span>
+            </button>
+        </nav>
+
+        <!-- Revolver Configuration Panel (Classic mode) -->
+        <section class="config-panel" id="configPanel">
+            <div class="config-header">
+                <h2 class="config-title">
+                    <svg class="config-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    Configure Revolver
+                </h2>
+                <div class="config-chance" id="configChance">
+                    <span class="config-chance-value" id="configChanceValue">1.0%</span>
+                    <span class="config-chance-label">shot chance</span>
+                </div>
+            </div>
+            <div class="config-controls">
+                <!-- Chambers Control -->
+                <div class="config-row">
+                    <div class="config-row-label">
+                        <span class="config-row-icon">🔲</span>
+                        <span>Chambers</span>
+                    </div>
+                    <div class="config-row-control">
+                        <button class="config-btn" onclick="adjustConfig('chambers', -1)" id="chamberMinus">−</button>
+                        <input type="range" class="config-slider" id="chamberSlider" min="2" max="100" value="100" oninput="onConfigSlider()">
+                        <button class="config-btn" onclick="adjustConfig('chambers', 1)" id="chamberPlus">+</button>
+                        <div class="config-value-display" id="chamberValueDisplay">100</div>
+                    </div>
+                </div>
+                <!-- Bullets Control -->
+                <div class="config-row">
+                    <div class="config-row-label">
+                        <span class="config-row-icon">💥</span>
+                        <span>Live Rounds</span>
+                    </div>
+                    <div class="config-row-control">
+                        <button class="config-btn config-btn--danger" onclick="adjustConfig('bullets', -1)" id="bulletMinus">−</button>
+                        <input type="range" class="config-slider config-slider--danger" id="bulletSlider" min="1" max="99" value="1" oninput="onConfigSlider()">
+                        <button class="config-btn config-btn--danger" onclick="adjustConfig('bullets', 1)" id="bulletPlus">+</button>
+                        <div class="config-value-display config-value-display--danger" id="bulletValueDisplay">1</div>
+                    </div>
+                </div>
+                <!-- Quick Presets -->
+                <div class="config-presets">
+                    <button class="config-preset" onclick="applyPreset(100, 1)">Safe<span>1/100</span></button>
+                    <button class="config-preset" onclick="applyPreset(6, 1)">Classic<span>1/6</span></button>
+                    <button class="config-preset" onclick="applyPreset(6, 3)">Half<span>3/6</span></button>
+                    <button class="config-preset" onclick="applyPreset(2, 1)">Coin Flip<span>1/2</span></button>
+                    <button class="config-preset" onclick="applyPreset(10, 5)">Risky<span>5/10</span></button>
+                    <button class="config-preset" onclick="applyPreset(6, 5)">Insane<span>5/6</span></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Escalation Level Display -->
+            <div class="escalation-display" id="escalationDisplay" style="display:none;">
+                <div class="escalation-bar">
+                    <div class="escalation-levels" id="escalationLevels"></div>
+                </div>
+                <div class="escalation-info" id="escalationInfo">Level 1 — 100 Chambers</div>
+            </div>
+
+            <!-- Modifier Display (Dealer's Choice) -->
+            <div class="modifier-display" id="modifierDisplay" style="display:none;">
+                <div class="modifier-slot" id="modifierSlot">
+                    <div class="modifier-slot-inner" id="modifierSlotInner">
+                        <span class="modifier-icon" id="modifierIcon">❓</span>
+                        <span class="modifier-name" id="modifierName">Spin to reveal</span>
+                    </div>
+                </div>
+                <div class="modifier-desc" id="modifierDesc">A random modifier will change the rules</div>
+            </div>
+
+            <!-- Cylinder Visualization -->
+            <section class="cylinder-section">
+                <div class="cylinder-container" id="cylinderContainer">
+                    <div class="cylinder-glow"></div>
+                    <!-- Probability Arc (SVG ring) -->
+                    <svg class="probability-arc" id="probabilityArc" viewBox="0 0 360 360">
+                        <circle class="prob-arc-bg" cx="180" cy="180" r="170" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="6"/>
+                        <circle class="prob-arc-fill" id="probArcFill" cx="180" cy="180" r="170" fill="none" stroke="url(#probGrad)" stroke-width="6" stroke-linecap="round" stroke-dasharray="1068" stroke-dashoffset="0" transform="rotate(-90 180 180)"/>
+                        <defs>
+                            <linearGradient id="probGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#44ff88"/>
+                                <stop offset="50%" stop-color="#ffcc44"/>
+                                <stop offset="100%" stop-color="#ff3b3b"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <!-- Countdown Timer Ring -->
+                    <svg class="countdown-ring" id="countdownRing" viewBox="0 0 360 360" style="display:none;">
+                        <circle class="countdown-ring-bg" cx="180" cy="180" r="165" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="4"/>
+                        <circle class="countdown-ring-fill" id="countdownRingFill" cx="180" cy="180" r="165" fill="none" stroke="#4488ff" stroke-width="4" stroke-linecap="round" stroke-dasharray="1037" stroke-dashoffset="0" transform="rotate(-90 180 180)"/>
+                    </svg>
+                    <!-- Countdown number -->
+                    <div class="countdown-number" id="countdownNumber" style="display:none;">5.0</div>
+
+                    <div class="cylinder" id="cylinder">
+                        <!-- Chambers rendered by JS -->
+                    </div>
+                    <div class="cylinder-center">
+                        <div class="cylinder-center-inner" id="centerDisplay">
+                            <span class="chamber-number" id="chamberNumber">?</span>
+                            <span class="chamber-label">CHAMBER</span>
+                        </div>
+                    </div>
+                    <!-- Indicator arrow -->
+                    <div class="cylinder-indicator">
+                        <svg viewBox="0 0 24 40" fill="none">
+                            <path d="M12 0 L24 15 L18 15 L18 40 L6 40 L6 15 L0 15 Z" fill="url(#indicatorGrad)"/>
+                            <defs>
+                                <linearGradient id="indicatorGrad" x1="12" y1="0" x2="12" y2="40" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#ff4444"/>
+                                    <stop offset="100%" stop-color="#ff4444" stop-opacity="0.3"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Probability Text -->
+                <div class="probability-text" id="probabilityText">
+                    <span class="prob-label">Survival odds:</span>
+                    <span class="prob-value" id="probValue">99%</span>
+                    <span class="prob-detail" id="probDetail">per pull</span>
+                </div>
+
+                <!-- Result Display -->
+                <div class="result-display" id="resultDisplay">
+                    <div class="result-content" id="resultContent">
+                        <span class="result-emoji" id="resultEmoji">🎯</span>
+                        <span class="result-text" id="resultText">Ready to play</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Controls -->
+            <section class="controls-section">
+                <button class="btn btn-spin" id="btnSpin" onclick="spinCylinder()">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                    </svg>
+                    <span>Spin Cylinder</span>
+                </button>
+                <button class="btn btn-fire" id="btnFire" onclick="pullTrigger()" disabled>
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    <span>Pull Trigger</span>
+                </button>
+                <button class="btn btn-reset" id="btnReset" onclick="resetGame()">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                        <path d="M3 3v5h5"/>
+                    </svg>
+                    <span>Reset</span>
+                </button>
+            </section>
+
+            <!-- Stats Panel -->
+            <section class="stats-section">
+                <h2 class="section-title">Session Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card" id="statAttempts">
+                        <div class="stat-card-value" id="totalAttempts">0</div>
+                        <div class="stat-card-label">Total Pulls</div>
+                        <div class="stat-card-icon">🔫</div>
+                    </div>
+                    <div class="stat-card" id="statSurvived">
+                        <div class="stat-card-value" id="totalSurvived">0</div>
+                        <div class="stat-card-label">Survived</div>
+                        <div class="stat-card-icon">✅</div>
+                    </div>
+                    <div class="stat-card" id="statFired">
+                        <div class="stat-card-value" id="totalFired">0</div>
+                        <div class="stat-card-label">Fired</div>
+                        <div class="stat-card-icon">💥</div>
+                    </div>
+                    <div class="stat-card" id="statRate">
+                        <div class="stat-card-value" id="survivalRate">—</div>
+                        <div class="stat-card-label">Survival Rate</div>
+                        <div class="stat-card-icon">📊</div>
+                    </div>
+                    <div class="stat-card" id="statStreak">
+                        <div class="stat-card-value" id="currentStreak">0</div>
+                        <div class="stat-card-label">Current Streak</div>
+                        <div class="stat-card-icon">🔥</div>
+                    </div>
+                    <div class="stat-card" id="statBest">
+                        <div class="stat-card-value" id="bestStreak">0</div>
+                        <div class="stat-card-label">Best Streak</div>
+                        <div class="stat-card-icon">🏆</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Log -->
+            <section class="history-section">
+                <h2 class="section-title">Pull History</h2>
+                <div class="history-log" id="historyLog">
+                    <div class="history-empty">No pulls yet — spin the cylinder to begin</div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Simulation only — No real firearms involved</p>
+        </footer>
+    </div>
+
+    <!-- Achievement Drawer -->
+    <div class="achievement-drawer-backdrop" id="achievementBackdrop" onclick="toggleAchievements()"></div>
+    <div class="achievement-drawer" id="achievementDrawer">
+        <div class="drawer-header">
+            <h2 class="drawer-title">🏆 Achievements</h2>
+            <button class="drawer-close" onclick="toggleAchievements()">✕</button>
+        </div>
+        <div class="badge-grid" id="badgeGrid">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- Achievement Toast -->
+    <div class="achievement-toast" id="achievementToast">
+        <div class="toast-content">
+            <span class="toast-icon" id="toastIcon">🏆</span>
+            <div class="toast-details">
+                <span class="toast-label">Achievement Unlocked!</span>
+                <span class="toast-name" id="toastName">—</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+
+    <!-- Flash overlay for gunshot -->
+    <div class="flash-overlay" id="flashOverlay"></div>
+    <!-- Muzzle flash effect -->
+    <div class="muzzle-flash" id="muzzleFlash">
+        <div class="muzzle-flash-inner"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
